@@ -82,7 +82,7 @@ namespace MigraWinPred
             Stopwatch regularSW = new Stopwatch();
             regularSW.Start();
             // Create a new DataTable
-            DataTable custTable = new DataTable("Contribuyentes");
+            /*DataTable custTable = new DataTable("Contribuyentes");
 
             // Create ID Column
             DataColumn IdCol = new DataColumn();
@@ -165,7 +165,7 @@ namespace MigraWinPred
             // Make the ID column the primary key column.
             DataColumn[] PrimaryKeyColumns = new DataColumn[1];
             PrimaryKeyColumns[0] = custTable.Columns["ID"];
-            custTable.PrimaryKey = PrimaryKeyColumns;
+            custTable.PrimaryKey = PrimaryKeyColumns;*/
 
             OdbcConnection connDBF = new OdbcConnection();
             connDBF.ConnectionString = ("Driver={Microsoft dBASE Driver (*.dbf)};DriverID=21;Dbq=C:\\Users\\user\\Desktop\\20121218\\DATOS\\;");
@@ -253,7 +253,7 @@ namespace MigraWinPred
                     string paterno = null, materno = null, nombre = null;
 
                     string[] palabras = new string[] { "DE", "LA", "DEL", "Y"};
-                    string[] PerMorales = new string[] { "C.V.", "S.A.", "TRIBUTARIA", "INSTITUTO" };
+                    string[] PerMorales = new string[] { "C.V.", "S.A.", "TRIBUTARIA", "INSTITUTO", "PRESIDENCIA" };
 
                     Boolean empresa = false;
 
@@ -382,12 +382,12 @@ namespace MigraWinPred
                                 {
                                     domicilioSinNum += " " + domicilioSeparado[z];
                                 }
-                                custTable.Rows.Add(counter, dbRow["CUENTA"].ToString().Trim(), nombre, paterno, materno, domicilioSinNum, domicilioSeparado.Last(), tipoEntidad);
+                                //custTable.Rows.Add(counter, dbRow["CUENTA"].ToString().Trim(), nombre, paterno, materno, domicilioSinNum, domicilioSeparado.Last(), tipoEntidad);
                                 numExt = domicilioSeparado.Last();
                             }
                             else
                             {
-                                custTable.Rows.Add(counter, dbRow["CUENTA"].ToString().Trim(), nombre, paterno, materno, domicilio, null, tipoEntidad);
+                                //custTable.Rows.Add(counter, dbRow["CUENTA"].ToString().Trim(), nombre, paterno, materno, domicilio, null, tipoEntidad);
                                 numExt = string.Empty;
                             }
                             
@@ -402,12 +402,12 @@ namespace MigraWinPred
                                 
                                 domicilioSinNum = domicilioSeparado[0];
                                 
-                                custTable.Rows.Add(counter, dbRow["CUENTA"], nombre, paterno, materno, domicilioSinNum, domicilioSeparado.Last(), tipoEntidad);
+                                //custTable.Rows.Add(counter, dbRow["CUENTA"], nombre, paterno, materno, domicilioSinNum, domicilioSeparado.Last(), tipoEntidad);
                                 numExt = domicilioSeparado.Last();
                             }
                             else
                             {
-                                custTable.Rows.Add(counter, dbRow["CUENTA"], nombre, paterno, materno, domicilio, null, tipoEntidad);
+                                //custTable.Rows.Add(counter, dbRow["CUENTA"], nombre, paterno, materno, domicilio, null, tipoEntidad);
                                 numExt = string.Empty;
                             }
                         }
@@ -1001,9 +1001,9 @@ namespace MigraWinPred
             // Create a dataset
             DataSet ds = new DataSet("Contribuyentes");
             // Add Customers table to the dataset
-            ds.Tables.Add(custTable);
+            //ds.Tables.Add(custTable);
             // Attach the data set to a DataGrid
-            dataGrid1.DataSource = ds.DefaultViewManager;
+            //dataGrid1.DataSource = ds.DefaultViewManager;
             regularSW.Stop();
             MessageBox.Show(regularSW.Elapsed.ToString());
         }
