@@ -735,7 +735,7 @@ namespace MigraWinPred
                                 var calle = insertaCallesPredio(mySqlConnection, calleSN, id_col);
                                 id_calle = Convert.ToInt32(calle);
                                 insertaUrbano(mySqlConnection, dbRow, id_calle);
-                                insertaUrbanoLog(mySqlConnection, dbRow, id_calle);
+                                //insertaUrbanoLog(mySqlConnection, dbRow, id_calle);
                             }
                             else if (idPoblacion > 0 && idPoblacion < 4)
                             {
@@ -745,7 +745,7 @@ namespace MigraWinPred
                                 var calle = insertaCallesPredio(mySqlConnection, calleSN, id_col);
                                 id_calle = Convert.ToInt32(calle);
                                 insertaUrbano(mySqlConnection, dbRow, id_calle);
-                                insertaUrbanoLog(mySqlConnection, dbRow, id_calle);
+                                //insertaUrbanoLog(mySqlConnection, dbRow, id_calle);
                             }
                             else if (idPoblacion >= 4 && idPoblacion < 27)
                             {
@@ -755,7 +755,7 @@ namespace MigraWinPred
                                 var calle = insertaCallesPredio(mySqlConnection, calleSN, id_col);
                                 id_calle = Convert.ToInt32(calle);
                                 insertaUrbano(mySqlConnection, dbRow, id_calle);
-                                insertaUrbanoLog(mySqlConnection, dbRow, id_calle);
+                                //insertaUrbanoLog(mySqlConnection, dbRow, id_calle);
                             }
                         }
 
@@ -781,7 +781,7 @@ namespace MigraWinPred
                                 id_com = Convert.ToInt32(com);
                                 //MessageBox.Show("Comunidad: "+id_com);
                                 insertaRustico(mySqlConnection, dbRow, id_com);
-                                insertaRusticoLog(mySqlConnection, dbRow, id_com);
+                                //insertaRusticoLog(mySqlConnection, dbRow, id_com);
                             }
                             else if (idPoblacion > 0 && idPoblacion < 4)
                             {
@@ -789,7 +789,7 @@ namespace MigraWinPred
                                 id_com = Convert.ToInt32(com);
                                 //MessageBox.Show("Comunidad: " + id_com);
                                 insertaRustico(mySqlConnection, dbRow, id_com);
-                                insertaRusticoLog(mySqlConnection, dbRow, id_com);
+                                //insertaRusticoLog(mySqlConnection, dbRow, id_com);
                             }
                             else if (idPoblacion >= 4 && idPoblacion < 27)
                             {
@@ -797,7 +797,7 @@ namespace MigraWinPred
                                 id_com = Convert.ToInt32(com);
                                 //MessageBox.Show("Comunidad: " + id_com);
                                 insertaRustico(mySqlConnection, dbRow, id_com);
-                                insertaRusticoLog(mySqlConnection, dbRow, id_com);
+                                //insertaRusticoLog(mySqlConnection, dbRow, id_com);
                             }
                         }
                     }
@@ -815,7 +815,9 @@ namespace MigraWinPred
                 return;
             }
             
+            
 
+            creaVistaPredio(mySqlConnection);
             try
             {
                 //if (System.IO.File.Exists(@"C:\DATOS1\PD_COLMED.DBF"))
@@ -834,7 +836,16 @@ namespace MigraWinPred
 
                 foreach (DataRow dbRow in dbTableColindancias.Rows)
                 {
-                    insertaColindancias(mySqlConnection, dbRow);
+                    if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "Clave");
+                        insertaColindancias(mySqlConnection, dbRow, buena);
+                    }
+                    else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
+                        insertaColindancias(mySqlConnection, dbRow, buena);
+                    }
                 }
                 /*
                 foreach (DataRow dbRow in dbTableColindancias.Rows)
@@ -844,7 +855,14 @@ namespace MigraWinPred
 
                 foreach (DataRow dbRow in dbTableColindancias.Rows)
                 {
-                    insertaColinCata(mySqlConnection, dbRow);
+                    if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "Clave");
+                        insertaColinCata(mySqlConnection, dbRow, buena);
+                    }else if(checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null){
+                        string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
+                        insertaColinCata(mySqlConnection, dbRow, buena);
+                    }
                 }
 
                 /*foreach (DataRow dbRow in dbTableColindancias.Rows)
@@ -875,7 +893,16 @@ namespace MigraWinPred
                 DataTable dbTableSuperficies = dtSetSuperficies.Tables[0];
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
-                    insertaSuperficies(mySqlConnection, dbRow);
+                    if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "Clave");
+                        insertaSuperficies(mySqlConnection, dbRow, buena);
+                    }
+                    else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
+                        insertaSuperficies(mySqlConnection, dbRow, buena);
+                    }
                 }
                 /*foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
@@ -883,15 +910,43 @@ namespace MigraWinPred
                 }*/
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
-                    insertaSuperCata(mySqlConnection, dbRow, "R", 26, "USO");
+                    if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "Clave");
+                        insertaSuperCata(mySqlConnection, dbRow, "R", 26, "USO", buena);
+                    }
+                    else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
+                        insertaSuperCata(mySqlConnection, dbRow, "R", 26, "USO", buena);
+                    }
+                    
                 }
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
-                    insertaSuperCata(mySqlConnection, dbRow, "R", 27, "TIPO_RIE");
+                    if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "Clave");
+                        insertaSuperCata(mySqlConnection, dbRow, "R", 27, "TIPO_RIE", buena);
+                    }
+                    else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
+                        insertaSuperCata(mySqlConnection, dbRow, "R", 27, "TIPO_RIE", buena);
+                    }
                 }
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
-                    insertaSuperCata(mySqlConnection, dbRow, "R", 28, "TIPO");
+                    if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "Clave");
+                        insertaSuperCata(mySqlConnection, dbRow, "R", 28, "TIPO", buena);
+                    }
+                    else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
+                        insertaSuperCata(mySqlConnection, dbRow, "R", 28, "TIPO", buena);
+                    }
                 }
                 /*foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
@@ -926,7 +981,16 @@ namespace MigraWinPred
                 DataTable dbTableSuperficies = dtSetSuperficies.Tables[0];
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
-                    insertaSuperficies(mySqlConnection, dbRow);
+                    if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "Clave");
+                        insertaSuperficies(mySqlConnection, dbRow, buena);
+                    }
+                    else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
+                        insertaSuperficies(mySqlConnection, dbRow, buena);
+                    }
                 }
                 /*foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
@@ -935,19 +999,55 @@ namespace MigraWinPred
 
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
-                    insertaSuperCata(mySqlConnection, dbRow, "U", 22, "TIPO");
+                    if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "Clave");
+                        insertaSuperCata(mySqlConnection, dbRow, "U", 22, "TIPO", buena);
+                    }
+                    else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
+                        insertaSuperCata(mySqlConnection, dbRow, "U", 22, "TIPO", buena);
+                    }
                 }
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
-                    insertaSuperCata(mySqlConnection, dbRow, "U", 23, "USO");
+                    if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "Clave");
+                        insertaSuperCata(mySqlConnection, dbRow, "U", 23, "USO", buena);
+                    }
+                    else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
+                        insertaSuperCata(mySqlConnection, dbRow, "U", 23, "USO", buena);
+                    }
                 }
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
-                    insertaSuperCata(mySqlConnection, dbRow, "U", 24, "CALIDAD");
+                    if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "Clave");
+                        insertaSuperCata(mySqlConnection, dbRow, "U", 24, "CALIDAD", buena);
+                    }
+                    else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
+                        insertaSuperCata(mySqlConnection, dbRow, "U", 24, "CALIDAD", buena);
+                    }
                 }
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
-                    insertaSuperCata(mySqlConnection, dbRow, "U", 25, "ESTADO");
+                    if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "Clave");
+                        insertaSuperCata(mySqlConnection, dbRow, "U", 25, "ESTADO", buena);
+                    }
+                    else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
+                    {
+                        string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
+                        insertaSuperCata(mySqlConnection, dbRow, "U", 25, "ESTADO", buena);
+                    }
                 }
                 /*foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
@@ -1325,7 +1425,7 @@ namespace MigraWinPred
             }
         }
 
-        private void insertaSuperCata(SqlConnection mySqlConnection, DataRow dbRow, string tipo, int tablaOp, string tabla)
+        private void insertaSuperCata(SqlConnection mySqlConnection, DataRow dbRow, string tipo, int tablaOp, string tabla, string buena)
         {
             try
             {
@@ -1334,7 +1434,7 @@ namespace MigraWinPred
                 cmd.Connection = mySqlConnection;
                 cmd.CommandType = CommandType.Text;
                 cmd.CommandText = @"select MAX(Num) from Tomin.TominPredial.SuperficieCatalogo where Clave = @clave AND Id_Catalogo = @cat";
-                cmd.Parameters.AddWithValue("@clave", dbRow["CPRED"].ToString().Trim());
+                cmd.Parameters.AddWithValue("@clave", buena);
                 cmd.Parameters.AddWithValue("@cat", tablaOp);
                 var num = cmd.ExecuteScalar();
 
@@ -1349,7 +1449,7 @@ namespace MigraWinPred
                         cmd1.CommandType = CommandType.Text;
                         cmd1.CommandText = @"INSERT INTO [Tomin].[TominPredial].[SuperficieCatalogo] ([Clave],[Num],[Id_Catalogo],[Valor],[Id_TipoPredio])"
                                             + " VALUES (@clave, @num, @cat,@valor, @tipo)";
-                        cmd1.Parameters.AddWithValue("@clave", dbRow["CPRED"].ToString().Trim());
+                        cmd1.Parameters.AddWithValue("@clave", buena);
                         cmd1.Parameters.AddWithValue("@num", 1);
                         cmd1.Parameters.AddWithValue("@cat", tablaOp);
                         cmd1.Parameters.AddWithValue("@valor", opcion);
@@ -1375,7 +1475,7 @@ namespace MigraWinPred
                         cmd1.CommandType = CommandType.Text;
                         cmd1.CommandText = @"INSERT INTO [Tomin].[TominPredial].[SuperficieCatalogo] ([Clave],[Num],[Id_Catalogo],[Valor],[Id_TipoPredio])"
                                             + " VALUES (@clave, @num, @cat,@valor, @tipo)";
-                        cmd1.Parameters.AddWithValue("@clave", dbRow["CPRED"].ToString().Trim());
+                        cmd1.Parameters.AddWithValue("@clave", buena);
                         cmd1.Parameters.AddWithValue("@num", numero + 1);
                         cmd1.Parameters.AddWithValue("@cat", tablaOp);
                         cmd1.Parameters.AddWithValue("@valor", opcion);
@@ -1503,7 +1603,7 @@ namespace MigraWinPred
 
         }
 
-        private void insertaSuperficies(SqlConnection mySqlConnection, DataRow dbRow)
+        private void insertaSuperficies(SqlConnection mySqlConnection, DataRow dbRow, string buena)
         {
             //MessageBox.Show("Entro");
             try
@@ -1513,7 +1613,7 @@ namespace MigraWinPred
                 cmd.Connection = mySqlConnection;
                 cmd.CommandType = CommandType.Text;
                 cmd.CommandText = @"select MAX(Num) from Tomin.TominPredial.Superficie Where Clave = @Clave";
-                cmd.Parameters.AddWithValue("@Clave", dbRow["CPRED"].ToString().Trim());
+                cmd.Parameters.AddWithValue("@Clave", buena);
                 var num = cmd.ExecuteScalar();
 
                 //MessageBox.Show("" + dbRow["CPRED"].ToString().Trim());
@@ -1528,7 +1628,7 @@ namespace MigraWinPred
                         cmd1.CommandType = CommandType.Text;
                         cmd1.CommandText = @"INSERT INTO [Tomin].[TominPredial].[Superficie] ([Clave],[Num],[Superficie],[Niveles])"
                                             + " VALUES (@Clave,@Num,@super,@niv)";
-                        cmd1.Parameters.AddWithValue("@Clave", dbRow["CPRED"].ToString().Trim());
+                        cmd1.Parameters.AddWithValue("@Clave", buena);
                         cmd1.Parameters.AddWithValue("@Num", 1);
                         cmd1.Parameters.AddWithValue("@super", dbRow["SUP"].ToString().Trim());
                         try
@@ -1565,7 +1665,7 @@ namespace MigraWinPred
                         cmd1.CommandType = CommandType.Text;
                         cmd1.CommandText = @"INSERT INTO [Tomin].[TominPredial].[Superficie] ([Clave],[Num],[Superficie],[Niveles])"
                                             + " VALUES (@Clave,@Num,@super,@niv)";
-                        cmd1.Parameters.AddWithValue("@Clave", dbRow["CPRED"].ToString().Trim());
+                        cmd1.Parameters.AddWithValue("@Clave", buena);
                         cmd1.Parameters.AddWithValue("@Num", numero + 1);
                         cmd1.Parameters.AddWithValue("@super", dbRow["SUP"].ToString().Trim());
                         try
@@ -1678,7 +1778,7 @@ namespace MigraWinPred
 
         }
 
-        private void insertaColinCata(SqlConnection mySqlConnection, DataRow dbRow)
+        private void insertaColinCata(SqlConnection mySqlConnection, DataRow dbRow, string buena)
         {
             try
             {
@@ -1687,7 +1787,7 @@ namespace MigraWinPred
                 cmd.Connection = mySqlConnection;
                 cmd.CommandType = CommandType.Text;
                 cmd.CommandText = @"select MAX(Num) from Tomin.TominPredial.ColindanciaCatalogo where Clave = @clave";
-                cmd.Parameters.AddWithValue("@clave", dbRow["CPRED"].ToString().Trim());
+                cmd.Parameters.AddWithValue("@clave", buena);
                 var num = cmd.ExecuteScalar();
 
                 if (num.Equals(DBNull.Value))
@@ -1701,7 +1801,7 @@ namespace MigraWinPred
                         cmd1.CommandType = CommandType.Text;
                         cmd1.CommandText = @"INSERT INTO [Tomin].[TominPredial].[ColindanciaCatalogo] ([Clave],[Num],[Id_Catalogo],[Valor])"
                                             + " VALUES (@clave, @num, @cat,@valor)";
-                        cmd1.Parameters.AddWithValue("@clave", dbRow["CPRED"].ToString().Trim());
+                        cmd1.Parameters.AddWithValue("@clave", buena);
                         cmd1.Parameters.AddWithValue("@num", 1);
                         cmd1.Parameters.AddWithValue("@cat", 21);
                         cmd1.Parameters.AddWithValue("@valor", opcion);
@@ -1726,7 +1826,7 @@ namespace MigraWinPred
                         cmd1.CommandType = CommandType.Text;
                         cmd1.CommandText = @"INSERT INTO [Tomin].[TominPredial].[ColindanciaCatalogo] ([Clave],[Num],[Id_Catalogo],[Valor])"
                                             + " VALUES (@clave, @num, @cat,@valor)";
-                        cmd1.Parameters.AddWithValue("@clave", dbRow["CPRED"].ToString().Trim());
+                        cmd1.Parameters.AddWithValue("@clave", buena);
                         cmd1.Parameters.AddWithValue("@num", numero + 1);
                         cmd1.Parameters.AddWithValue("@cat", 21);
                         cmd1.Parameters.AddWithValue("@valor", opcion);
@@ -1848,7 +1948,7 @@ namespace MigraWinPred
 
         }
 
-        private void insertaColindancias(SqlConnection mySqlConnection, DataRow dbRow)
+        private void insertaColindancias(SqlConnection mySqlConnection, DataRow dbRow, string buena)
         {
 
             //MessageBox.Show("Entro");
@@ -1861,7 +1961,7 @@ namespace MigraWinPred
                 cmd.Connection = mySqlConnection;
                 cmd.CommandType = CommandType.Text;
                 cmd.CommandText = @"select MAX(Num) from Tomin.TominPredial.Colindancia Where Clave = @Clave";
-                cmd.Parameters.AddWithValue("@Clave", dbRow["CPRED"].ToString().Trim());
+                cmd.Parameters.AddWithValue("@Clave", buena);
                 var num = cmd.ExecuteScalar();
 
                 //MessageBox.Show("" + dbRow["CPRED"].ToString().Trim());
@@ -1877,7 +1977,7 @@ namespace MigraWinPred
                         cmd1.CommandType = CommandType.Text;
                         cmd1.CommandText = @"INSERT INTO [Tomin].[TominPredial].[Colindancia] ([Clave],[Num],[Medida],[Notas])"
                                             + " VALUES (@Clave,@Num,@Medida,@Notas)";
-                        cmd1.Parameters.AddWithValue("@Clave", dbRow["CPRED"].ToString().Trim());
+                        cmd1.Parameters.AddWithValue("@Clave", buena);
                         cmd1.Parameters.AddWithValue("@Num", 1);
                         cmd1.Parameters.AddWithValue("@Medida", dbRow["MEDIDA"].ToString().Trim());
                         cmd1.Parameters.AddWithValue("@Notas", dbRow["COL_NOTAS"].ToString().Trim());
@@ -1917,7 +2017,7 @@ namespace MigraWinPred
                         cmd1.CommandType = CommandType.Text;
                         cmd1.CommandText = @"INSERT INTO [Tomin].[TominPredial].[Colindancia]([Clave],[Num],[Medida],[Notas])"
                                             + " VALUES(@Clave,@Num,@Medida,@Notas)";
-                        cmd1.Parameters.AddWithValue("@Clave", dbRow["CPRED"].ToString().Trim());
+                        cmd1.Parameters.AddWithValue("@Clave", buena);
                         cmd1.Parameters.AddWithValue("@Num", numero + 1);
                         cmd1.Parameters.AddWithValue("@Medida", dbRow["MEDIDA"].ToString().Trim());
                         cmd1.Parameters.AddWithValue("@Notas", dbRow["COL_NOTAS"].ToString().Trim());
@@ -1955,7 +2055,25 @@ namespace MigraWinPred
 
         }
 
-        private string checaPredio(SqlConnection mySqlConnection, DataRow dbRow)
+        private void creaVistaPredio(SqlConnection mySqlConnection)
+        {
+            try
+            {
+                var cmd1 = new SqlCommand();
+                cmd1.Parameters.Clear();
+                cmd1.Connection = mySqlConnection;
+                cmd1.CommandType = CommandType.Text;
+                cmd1.CommandText = @"create view vwPredial as select Clave, ClaveAnt from Tomin.TominPredial.Predio";
+                cmd1.ExecuteNonQuery();
+                
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.ToString());
+            }
+        }
+
+        private string checaPredio(SqlConnection mySqlConnection, DataRow dbRow, string donde)
         {
             //MesageBox.Show("Cero");
             try
@@ -1964,12 +2082,12 @@ namespace MigraWinPred
                 cmd1.Parameters.Clear();
                 cmd1.Connection = mySqlConnection;
                 cmd1.CommandType = CommandType.Text;
-                cmd1.CommandText = @"select MAX(Clave) from Tomin.TominPredial.Predio Where Clave = @clave or ClaveAnt = @clave";
+                cmd1.CommandText = @"select MAX(Clave) from vwPredial where "+ donde + " = @clave";
                 cmd1.Parameters.AddWithValue("@clave", dbRow["CPRED"].ToString().Trim());
                 var so = cmd1.ExecuteScalar();
-                string buena = Convert.ToString(so);
                 if (!so.Equals(DBNull.Value))
                 {
+                    string buena = Convert.ToString(so);
                     return buena;
                 }
                 else
@@ -2490,7 +2608,6 @@ namespace MigraWinPred
                 return "";
             }
         }
-
 
         private Object checaColDuplicados(SqlConnection mySqlConnection, String nombre, int id_pob, int contador)
         {
