@@ -131,7 +131,7 @@ namespace MigraWinPred
             try
             {
                 // Open Drawing Database
-                
+
 
                 // Query para insertar entidades
                 string jobData = "SELECT * FROM CONTRIB.DBF";
@@ -154,7 +154,7 @@ namespace MigraWinPred
                     string ultimoasignado = null;
                     //bool repe = checaDuplicados(NombreCompleto);
                     //if (!checaDuplicados(NombreCompleto, mySqlConnection))
-                      //  MessageBox.Show(checaDuplicados(NombreCompleto, mySqlConnection).ToString());
+                    //  MessageBox.Show(checaDuplicados(NombreCompleto, mySqlConnection).ToString());
                     //MessageBox.Show(NombreCompleto);
                     String[] separados;
                     separados = NombreCompleto.Split(" ".ToCharArray());
@@ -167,7 +167,7 @@ namespace MigraWinPred
 
                     string paterno = null, materno = null, nombre = null;
 
-                    string[] palabras = new string[] { "DE", "LA", "DEL", "Y"};
+                    string[] palabras = new string[] { "DE", "LA", "DEL", "Y" };
                     string[] PerMorales = new string[] { "C.V.", "S.A.", "TRIBUTARIA", "INSTITUTO", "PRESIDENCIA" };
 
                     Boolean empresa = false;
@@ -190,7 +190,7 @@ namespace MigraWinPred
                             nombre = NombreCompleto;
                             tipoEntidad = 4;
                         }
-                        else 
+                        else
                         {
                             foreach (string word in separados)
                             {
@@ -280,20 +280,20 @@ namespace MigraWinPred
                         nombre = separados[1];
                         tipoEntidad = 3;
                     }
-                    else 
+                    else
                     {
                         nombre = NombreCompleto;
                         tipoEntidad = 3;
                     }
 
-                    if (dbRow["CUENTA"] != null )
+                    if (dbRow["CUENTA"] != null)
                     {
                         if (domicilioSeparado.Length > 1)
                         {
                             if (Regex.IsMatch(domicilioSeparado.Last(), @"\d"))
                             {
                                 String domicilioSinNum = "";
-                                for (int z = 0; z < domicilioSeparado.Length-1; z++)
+                                for (int z = 0; z < domicilioSeparado.Length - 1; z++)
                                 {
                                     domicilioSinNum += " " + domicilioSeparado[z];
                                 }
@@ -305,18 +305,19 @@ namespace MigraWinPred
                                 //custTable.Rows.Add(counter, dbRow["CUENTA"].ToString().Trim(), nombre, paterno, materno, domicilio, null, tipoEntidad);
                                 numExt = string.Empty;
                             }
-                            
-                        }
-                        else {
 
-                            
+                        }
+                        else
+                        {
+
+
                             domicilioSeparado = domicilio.Split('#');
                             if (Regex.IsMatch(domicilioSeparado.Last(), @"\d"))
                             {
                                 String domicilioSinNum = "";
-                                
+
                                 domicilioSinNum = domicilioSeparado[0];
-                                
+
                                 //custTable.Rows.Add(counter, dbRow["CUENTA"], nombre, paterno, materno, domicilioSinNum, domicilioSeparado.Last(), tipoEntidad);
                                 numExt = domicilioSeparado.Last();
                             }
@@ -363,7 +364,7 @@ namespace MigraWinPred
                                 cmdEntidad.CommandText = @"INSERT INTO [Tomin].[TominRH].[Entidad] "
                                     + "([Id_Entidad],[Nombre],[RFC],[Id_TipoEntidad]) "
                                 + " Values (@id_entidad, @nombre, 'VACIO', 4)";
-                                cmdEntidad.Parameters.AddWithValue("@id_entidad",dbRow["CUENTA"].ToString().Trim());
+                                cmdEntidad.Parameters.AddWithValue("@id_entidad", dbRow["CUENTA"].ToString().Trim());
                                 cmdEntidad.Parameters.AddWithValue("@nombre", NombreCompleto ?? string.Empty);
                                 cmdEntidad.ExecuteNonQuery();
                             }
@@ -372,10 +373,53 @@ namespace MigraWinPred
                                 MessageBox.Show("Entidad empresa  " + e.ToString());
                             }
                         }
-                                       
-                    if (!empresa)
-                    {
-                        if ((paterno == null) && (materno == null))
+
+                        if (!empresa)
+                        {
+                            if ((paterno == null) && (materno == null))
+                            {
+                                try
+                                {
+                                    var cmdEmpresa = new SqlCommand();
+                                    cmdEmpresa.Parameters.Clear();
+                                    cmdEmpresa.Connection = mySqlConnection;
+                                    cmdEmpresa.CommandType = CommandType.Text;
+                                    cmdEmpresa.CommandText = @"INSERT INTO [Tomin].[TominRH].[Empresa] "
+                                        + "([Id_Entidad],[Nombre],[WebPage],[Representante])"
+                                        + " Values (@id_entidad, @nombre, 'MAIL', 'Representante')";
+                                    cmdEmpresa.Parameters.AddWithValue("@id_entidad", dbRow["CUENTA"].ToString().Trim());
+                                    cmdEmpresa.Parameters.AddWithValue("@nombre", NombreCompleto ?? string.Empty);
+                                    cmdEmpresa.ExecuteNonQuery();
+                                }
+                                catch (Exception e)
+                                {
+                                    MessageBox.Show("Empresa  " + e.ToString());
+                                }
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    var cmdPersona_Log = new SqlCommand();
+                                    cmdPersona_Log.Parameters.Clear();
+                                    cmdPersona_Log.Connection = mySqlConnection;
+                                    cmdPersona_Log.CommandType = CommandType.Text;
+                                    cmdPersona_Log.CommandText = @"INSERT INTO [Tomin].[TominRH].[Persona] "
+                                        + "([Id_Entidad],[Nombre],[Paterno],[Materno],[Sexo],[Id_Nacionalidad], [FechaNacimiento])"
+                                        + " Values ( @id_entidad, @nombre, @paterno, @materno, 1, 52, '01-01-1900')";
+                                    cmdPersona_Log.Parameters.AddWithValue("@id_entidad", dbRow["CUENTA"].ToString().Trim());
+                                    cmdPersona_Log.Parameters.AddWithValue("@nombre", nombre ?? string.Empty);
+                                    cmdPersona_Log.Parameters.AddWithValue("@paterno", paterno ?? string.Empty);
+                                    cmdPersona_Log.Parameters.AddWithValue("@materno", materno ?? string.Empty);
+                                    cmdPersona_Log.ExecuteNonQuery();
+                                }
+                                catch (Exception e)
+                                {
+                                    MessageBox.Show(dbRow["CUENTA"] + " Persona  " + e.ToString());
+                                }
+                            }
+                        }
+                        else
                         {
                             try
                             {
@@ -392,78 +436,10 @@ namespace MigraWinPred
                             }
                             catch (Exception e)
                             {
-                              MessageBox.Show("Empresa  " + e.ToString());
+                                MessageBox.Show("Empresa2  " + e.ToString());
                             }
-                        }
-                        else
-                        {
-                            try
-                            {
-                                var cmdPersona_Log = new SqlCommand();
-                                cmdPersona_Log.Parameters.Clear();
-                                cmdPersona_Log.Connection = mySqlConnection;
-                                cmdPersona_Log.CommandType = CommandType.Text;
-                                cmdPersona_Log.CommandText = @"INSERT INTO [Tomin].[TominRH].[Persona] "
-                                    + "([Id_Entidad],[Nombre],[Paterno],[Materno],[Sexo],[Id_Nacionalidad], [FechaNacimiento])"
-                                    + " Values ( @id_entidad, @nombre, @paterno, @materno, 1, 52, '01-01-1900')";
-                                cmdPersona_Log.Parameters.AddWithValue("@id_entidad", dbRow["CUENTA"].ToString().Trim());
-                                cmdPersona_Log.Parameters.AddWithValue("@nombre", nombre ?? string.Empty);
-                                cmdPersona_Log.Parameters.AddWithValue("@paterno", paterno ?? string.Empty);
-                                cmdPersona_Log.Parameters.AddWithValue("@materno", materno ?? string.Empty);
-                                cmdPersona_Log.ExecuteNonQuery();
-                            }
-                            catch (Exception e)
-                            {
-                                MessageBox.Show(dbRow["CUENTA"] + " Persona  " + e.ToString());
-                            }
-                        }
-                    }
-                    else 
-                    {
-                        try
-                        {
-                            var cmdEmpresa = new SqlCommand();
-                            cmdEmpresa.Parameters.Clear();
-                            cmdEmpresa.Connection = mySqlConnection;
-                            cmdEmpresa.CommandType = CommandType.Text;
-                            cmdEmpresa.CommandText = @"INSERT INTO [Tomin].[TominRH].[Empresa] "
-                                + "([Id_Entidad],[Nombre],[WebPage],[Representante])"
-                                + " Values (@id_entidad, @nombre, 'MAIL', 'Representante')";
-                            cmdEmpresa.Parameters.AddWithValue("@id_entidad", dbRow["CUENTA"].ToString().Trim());
-                            cmdEmpresa.Parameters.AddWithValue("@nombre", NombreCompleto ?? string.Empty);
-                            cmdEmpresa.ExecuteNonQuery();
-                        }
-                        catch (Exception e)
-                        {
-                           MessageBox.Show("Empresa2  " + e.ToString());
-                        }
 
-                    }
-                    try
-                    {
-                        //Log Entidad
-                        var cmdEntidadLog = new SqlCommand();
-                        cmdEntidadLog.Parameters.Clear();
-                        cmdEntidadLog.Connection = mySqlConnection;
-                        cmdEntidadLog.CommandType = CommandType.Text;
-                        cmdEntidadLog.CommandText = @"INSERT INTO [Tomin].[TominRH].[Direccion] "
-                            + "([Id_Entidad],[Id_TipoDireccion],[Calle],[NumeroExt],[CP],[Colonia],[Comunidad],[Id_Ciudad],[Id_User],[Id_Date]) "
-                            + " Values (@id_entidad, 1, @calle, @numExt, 98600, @colonia, @comunidad, 17, 'Admin', @fecha)";
-                        cmdEntidadLog.Parameters.AddWithValue("@id_entidad", dbRow["CUENTA"].ToString().Trim());
-                        cmdEntidadLog.Parameters.AddWithValue("@calle", dbRow["DOMICILIO"].ToString().Trim());
-                        cmdEntidadLog.Parameters.AddWithValue("@numExt", numExt ?? string.Empty);
-                        cmdEntidadLog.Parameters.AddWithValue("@colonia", dbRow["COLONIA"].ToString().Trim());
-                        cmdEntidadLog.Parameters.AddWithValue("@comunidad", dbRow["CIUDAD"].ToString().Trim());
-                        cmdEntidadLog.Parameters.AddWithValue("@fecha", DateTime.Now);
-                        cmdEntidadLog.ExecuteNonQuery();
-                        
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show(numExt + " Direccion  " + e.ToString());
-                    }
-                    if (!empresa)
-                    {
+                        }
                         try
                         {
                             //Log Entidad
@@ -471,124 +447,34 @@ namespace MigraWinPred
                             cmdEntidadLog.Parameters.Clear();
                             cmdEntidadLog.Connection = mySqlConnection;
                             cmdEntidadLog.CommandType = CommandType.Text;
-                            cmdEntidadLog.CommandText = @"INSERT INTO [Tomin].[TominRH].[Entidad_Log] "
-                                + "([Id_Action],[Id_User],[Id_Date],[Id_Entidad],[Nombre],[RFC],[Email],[Id_TipoEntidad]) "
-                                + " Values (1, 'Admin', @fecha, @id_entidad, @nombre, 'VACIO', 'MAIL', 3)";
-                            cmdEntidadLog.Parameters.AddWithValue("@fecha", DateTime.Now);
+                            cmdEntidadLog.CommandText = @"INSERT INTO [Tomin].[TominRH].[Direccion] "
+                                + "([Id_Entidad],[Id_TipoDireccion],[Calle],[NumeroExt],[CP],[Colonia],[Comunidad],[Id_Ciudad],[Id_User],[Id_Date]) "
+                                + " Values (@id_entidad, 1, @calle, @numExt, 98600, @colonia, @comunidad, 17, 'Admin', @fecha)";
                             cmdEntidadLog.Parameters.AddWithValue("@id_entidad", dbRow["CUENTA"].ToString().Trim());
-                            cmdEntidadLog.Parameters.AddWithValue("@nombre", NombreCompleto ?? string.Empty);
-                            cmdEntidadLog.ExecuteNonQuery();
-                        }
-                        catch (Exception e)
-                        {
-                           MessageBox.Show("Entidad_log persona  "+e.ToString());
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            //Log Entidad
-                            var cmdEntidadLog = new SqlCommand();
-                            cmdEntidadLog.Parameters.Clear();
-                            cmdEntidadLog.Connection = mySqlConnection;
-                            cmdEntidadLog.CommandType = CommandType.Text;
-                            cmdEntidadLog.CommandText = @"INSERT INTO [Tomin].[TominRH].[Entidad_Log] "
-                                + "([Id_Action],[Id_User],[Id_Date],[Id_Entidad],[Nombre],[RFC],[Email],[Id_TipoEntidad]) "
-                                + " Values (1, 'Admin', @fecha, @id_entidad, @nombre, 'VACIO', 'MAIL', 4)";
+                            cmdEntidadLog.Parameters.AddWithValue("@calle", dbRow["DOMICILIO"].ToString().Trim());
+                            cmdEntidadLog.Parameters.AddWithValue("@numExt", numExt ?? string.Empty);
+                            cmdEntidadLog.Parameters.AddWithValue("@colonia", dbRow["COLONIA"].ToString().Trim());
+                            cmdEntidadLog.Parameters.AddWithValue("@comunidad", dbRow["CIUDAD"].ToString().Trim());
                             cmdEntidadLog.Parameters.AddWithValue("@fecha", DateTime.Now);
-                            cmdEntidadLog.Parameters.AddWithValue("@id_entidad", dbRow["CUENTA"].ToString().Trim());
-                            cmdEntidadLog.Parameters.AddWithValue("@nombre", NombreCompleto ?? string.Empty);
                             cmdEntidadLog.ExecuteNonQuery();
-                        }
-                        catch (Exception e)
-                        {
-                           MessageBox.Show("Entidad_log empresa" + e.ToString());
-                        }
-                    }
-                    
-                    if (!empresa)
-                    {
-                        if ((paterno == null) && (materno == null))
-                        {
-                            try
-                            {
-                                var cmdEmpresa_Log = new SqlCommand();
-                                cmdEmpresa_Log.Parameters.Clear();
-                                cmdEmpresa_Log.Connection = mySqlConnection;
-                                cmdEmpresa_Log.CommandType = CommandType.Text;
-                                cmdEmpresa_Log.CommandText = @"INSERT INTO [Tomin].[TominRH].[Empresa_Log] "
-                                    + "([Id_Action],[Id_User],[Id_Date],[Id_Entidad],[Nombre],[WebPage],[Representante])"
-                                    + " Values (1, 'Admin', @fecha, @id_entidad, @nombre, 'MAIL', 'Representante')";
-                                cmdEmpresa_Log.Parameters.AddWithValue("@fecha", DateTime.Now);
-                                cmdEmpresa_Log.Parameters.AddWithValue("@id_entidad", dbRow["CUENTA"].ToString().Trim());
-                                cmdEmpresa_Log.Parameters.AddWithValue("@nombre", NombreCompleto ?? string.Empty);
-                                cmdEmpresa_Log.ExecuteNonQuery();
-                            }
-                            catch(Exception e) 
-                            {
-                               MessageBox.Show("Empresa_log  " + e.ToString());
-                            }
-                                
-                        }
-                        else
-                        {
-                            try{
-                                var cmdPersona_Log = new SqlCommand();
-                                cmdPersona_Log.Parameters.Clear();
-                                cmdPersona_Log.Connection = mySqlConnection;
-                                cmdPersona_Log.CommandType = CommandType.Text;
-                                cmdPersona_Log.CommandText = @"INSERT INTO [Tomin].[TominRH].[Persona_Log] "
-                                    + "([Id_Action],[Id_User],[Id_Date],[Id_Entidad],[Nombre],[Paterno],[Materno],[Sexo], [FechaNacimiento],[Id_Nacionalidad])"
-                                    + " Values (1, 'Admin', @fecha, @id_entidad, @nombre, @paterno, @materno, @sexo, '01-01-1900' , 52)";
-                                cmdPersona_Log.Parameters.AddWithValue("@fecha", DateTime.Now);
-                                cmdPersona_Log.Parameters.AddWithValue("@id_entidad", dbRow["CUENTA"].ToString().Trim());
-                                cmdPersona_Log.Parameters.AddWithValue("@nombre", nombre ?? string.Empty);
-                                cmdPersona_Log.Parameters.AddWithValue("@paterno", paterno ?? string.Empty);
-                                cmdPersona_Log.Parameters.AddWithValue("@materno", materno ?? string.Empty);
-                                cmdPersona_Log.Parameters.AddWithValue("@sexo", true);
-                                cmdPersona_Log.ExecuteNonQuery();
-                            }
-                            catch(Exception e) 
-                            {
-                              MessageBox.Show(dbRow["CUENTA"] + " Persona_log  " + e.ToString());
-                            }
-                        }
-                    }
-                    else
-                    {
-                        try{
-                            var cmdEmpresa_Log = new SqlCommand();
-                            cmdEmpresa_Log.Parameters.Clear();
-                            cmdEmpresa_Log.Connection = mySqlConnection;
-                            cmdEmpresa_Log.CommandType = CommandType.Text;
-                            cmdEmpresa_Log.CommandText = @"INSERT INTO [Tomin].[TominRH].[Empresa_Log] "
-                                + "([Id_Action],[Id_User],[Id_Date],[Id_Entidad],[Nombre],[WebPage],[Representante])"
-                                + " Values (1, 'Admin', @fecha, @id_entidad, '@nombre', 'MAIL', 'Representante')";
-                            cmdEmpresa_Log.Parameters.AddWithValue("@fecha", DateTime.Now);
-                            cmdEmpresa_Log.Parameters.AddWithValue("@id_entidad", dbRow["CUENTA"].ToString().Trim());
-                            cmdEmpresa_Log.Parameters.AddWithValue("@nombre", NombreCompleto ?? string.Empty);
-                            cmdEmpresa_Log.ExecuteNonQuery();
-                        }
-                        catch(Exception e) 
-                        {
-                          MessageBox.Show("Empresa_log2  " + e.ToString());
-                        }
-                    }
-    
 
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show(numExt + " Direccion  " + e.ToString());
+                        }
                     }
 
                 } // termina foreach (DataRow dbRow in dbTable.Rows)
 
-               
+
 
             }
             catch // (Exception e) // Exception Removed
             {
                 return;
             } // catch
-            
+
 
             int conta = 0;
 
@@ -622,10 +508,7 @@ namespace MigraWinPred
                     {
                         if (insertaPredio(mySqlConnection, dbRow, tipoPredio))
                         {
-
-                            //insertaPredioLog(mySqlConnection, dbRow, tipoPredio);
                             insertaPredioContribuyente(mySqlConnection, dbRow);
-                            //insertaPredioContribuyenteLog(mySqlConnection, dbRow);
                             insertaPredioCatalogo(mySqlConnection, dbRow, tipoPredio, 1, "U_ZONA");
                             insertaPredioCatalogoSN(mySqlConnection, dbRow, tipoPredio, 2, "U_BALDIO");
                             insertaPredioCatalogo(mySqlConnection, dbRow, tipoPredio, 3, "REGPROP");
@@ -650,7 +533,6 @@ namespace MigraWinPred
                                 var calle = insertaCallesPredio(mySqlConnection, calleSN, id_col);
                                 id_calle = Convert.ToInt32(calle);
                                 insertaUrbano(mySqlConnection, dbRow, id_calle);
-                                //insertaUrbanoLog(mySqlConnection, dbRow, id_calle);
                             }
                             else if (idPoblacion > 0 && idPoblacion < 4)
                             {
@@ -660,7 +542,6 @@ namespace MigraWinPred
                                 var calle = insertaCallesPredio(mySqlConnection, calleSN, id_col);
                                 id_calle = Convert.ToInt32(calle);
                                 insertaUrbano(mySqlConnection, dbRow, id_calle);
-                                //insertaUrbanoLog(mySqlConnection, dbRow, id_calle);
                             }
                             else if (idPoblacion >= 4 && idPoblacion < 27)
                             {
@@ -670,7 +551,6 @@ namespace MigraWinPred
                                 var calle = insertaCallesPredio(mySqlConnection, calleSN, id_col);
                                 id_calle = Convert.ToInt32(calle);
                                 insertaUrbano(mySqlConnection, dbRow, id_calle);
-                                //insertaUrbanoLog(mySqlConnection, dbRow, id_calle);
                             }
                         }
 
@@ -679,10 +559,7 @@ namespace MigraWinPred
                     {
                         if (insertaPredio(mySqlConnection, dbRow, tipoPredio))
                         {
-
-                            //insertaPredioLog(mySqlConnection, dbRow, tipoPredio);
                             insertaPredioContribuyente(mySqlConnection, dbRow);
-                            //insertaPredioContribuyenteLog(mySqlConnection, dbRow);
                             insertaPredioCatalogoSN(mySqlConnection, dbRow, tipoPredio, 6, "RE_ELEC");
                             insertaPredioCatalogo(mySqlConnection, dbRow, tipoPredio, 3, "REGPROP");
                             insertaPredioCatalogo(mySqlConnection, dbRow, tipoPredio, 16, "RE_ACCESO");
@@ -694,31 +571,24 @@ namespace MigraWinPred
                             {
                                 var com = checaComDuplicados(mySqlConnection, dbRow["COLONIAP"].ToString().Trim(), idPoblacion - 2, conta);
                                 id_com = Convert.ToInt32(com);
-                                //MessageBox.Show("Comunidad: "+id_com);
                                 insertaRustico(mySqlConnection, dbRow, id_com);
-                                //insertaRusticoLog(mySqlConnection, dbRow, id_com);
                             }
                             else if (idPoblacion > 0 && idPoblacion < 4)
                             {
                                 var com = checaComDuplicados(mySqlConnection, dbRow["COLONIAP"].ToString().Trim(), idPoblacion, conta);
                                 id_com = Convert.ToInt32(com);
-                                //MessageBox.Show("Comunidad: " + id_com);
                                 insertaRustico(mySqlConnection, dbRow, id_com);
-                                //insertaRusticoLog(mySqlConnection, dbRow, id_com);
                             }
                             else if (idPoblacion >= 4 && idPoblacion < 27)
                             {
                                 var com = checaComDuplicados(mySqlConnection, dbRow["COLONIAP"].ToString().Trim(), idPoblacion - 1, conta);
                                 id_com = Convert.ToInt32(com);
-                                //MessageBox.Show("Comunidad: " + id_com);
                                 insertaRustico(mySqlConnection, dbRow, id_com);
-                                //insertaRusticoLog(mySqlConnection, dbRow, id_com);
                             }
                         }
                     }
                     else
                     {
-                        //MessageBox.Show("No tipo " + dbRow["ID_POB"]);
                     }
 
 
@@ -729,14 +599,12 @@ namespace MigraWinPred
                 MessageBox.Show(e.ToString());
                 return;
             }
-            
-            
+
+
 
             creaVistaPredio(mySqlConnection);
             try
             {
-                //if (System.IO.File.Exists(@"C:\DATOS1\PD_COLMED.DBF"))
-                //MessageBox.Show("Existe");
                 string jobData2 = @"SELECT * FROM colin.DBF";
 
                 OdbcCommand cmd = new OdbcCommand();
@@ -746,7 +614,6 @@ namespace MigraWinPred
 
                 DataSet dtSetColindancias = new DataSet();
                 dbAdapter.Fill(dtSetColindancias);
-                //MessageBox.Show("Si entra");
                 DataTable dbTableColindancias = dtSetColindancias.Tables[0];
 
                 foreach (DataRow dbRow in dbTableColindancias.Rows)
@@ -762,11 +629,6 @@ namespace MigraWinPred
                         insertaColindancias(mySqlConnection, dbRow, buena);
                     }
                 }
-                /*
-                foreach (DataRow dbRow in dbTableColindancias.Rows)
-                {
-                    insertaColindanciasLog(mySqlConnection, dbRow);
-                }*/
 
                 foreach (DataRow dbRow in dbTableColindancias.Rows)
                 {
@@ -774,25 +636,20 @@ namespace MigraWinPred
                     {
                         string buena = checaPredio(mySqlConnection, dbRow, "Clave");
                         insertaColinCata(mySqlConnection, dbRow, buena);
-                    }else if(checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null){
+                    }
+                    else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
+                    {
                         string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
                         insertaColinCata(mySqlConnection, dbRow, buena);
                     }
                 }
-
-                /*foreach (DataRow dbRow in dbTableColindancias.Rows)
-                {
-                    insertaColinCataLog(mySqlConnection, dbRow);
-                }*/
-
-
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
             }
+           
 
-            
             try
             {
                 string jobData2 = @"SELECT * FROM PD_SUPR.DBF";
@@ -804,7 +661,6 @@ namespace MigraWinPred
 
                 DataSet dtSetSuperficies = new DataSet();
                 dbAdapter.Fill(dtSetSuperficies);
-                //MessageBox.Show("Si entra");
                 DataTable dbTableSuperficies = dtSetSuperficies.Tables[0];
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
@@ -819,23 +675,20 @@ namespace MigraWinPred
                         insertaSuperficies(mySqlConnection, dbRow, buena);
                     }
                 }
-                /*foreach (DataRow dbRow in dbTableSuperficies.Rows)
-                {
-                    insertaSuperficiesLog(mySqlConnection, dbRow);
-                }*/
+
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
                     if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
                     {
                         string buena = checaPredio(mySqlConnection, dbRow, "Clave");
-                        insertaSuperCata(mySqlConnection, dbRow, "R", 26, "USO", buena);
+                        insertaSuperCata(mySqlConnection, dbRow, "R", 26, "TIPO", buena);
                     }
                     else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
                     {
                         string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
-                        insertaSuperCata(mySqlConnection, dbRow, "R", 26, "USO", buena);
+                        insertaSuperCata(mySqlConnection, dbRow, "R", 26, "TIPO", buena);
                     }
-                    
+
                 }
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
@@ -855,32 +708,20 @@ namespace MigraWinPred
                     if (checaPredio(mySqlConnection, dbRow, "Clave") != null)
                     {
                         string buena = checaPredio(mySqlConnection, dbRow, "Clave");
-                        insertaSuperCata(mySqlConnection, dbRow, "R", 28, "TIPO", buena);
+                        insertaSuperCata(mySqlConnection, dbRow, "R", 28, "USO", buena);
                     }
                     else if (checaPredio(mySqlConnection, dbRow, "ClaveAnt") != null)
                     {
                         string buena = checaPredio(mySqlConnection, dbRow, "ClaveAnt");
-                        insertaSuperCata(mySqlConnection, dbRow, "R", 28, "TIPO", buena);
+                        insertaSuperCata(mySqlConnection, dbRow, "R", 28, "USO", buena);
                     }
                 }
-                /*foreach (DataRow dbRow in dbTableSuperficies.Rows)
-                {
-                    insertaSuperCataLog(mySqlConnection, dbRow, "R", 26, "USO");
-                }
-                foreach (DataRow dbRow in dbTableSuperficies.Rows)
-                {
-                    insertaSuperCataLog(mySqlConnection, dbRow, "R", 27, "TIPO_RIE");
-                }
-                foreach (DataRow dbRow in dbTableSuperficies.Rows)
-                {
-                    insertaSuperCataLog(mySqlConnection, dbRow, "R", 28, "TIPO");
-                }*/
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
             }
-
+            
             try
             {
                 string jobData2 = @"SELECT * FROM PD_CONST.DBF";
@@ -892,7 +733,6 @@ namespace MigraWinPred
 
                 DataSet dtSetSuperficies = new DataSet();
                 dbAdapter.Fill(dtSetSuperficies);
-                //MessageBox.Show("Si entra");
                 DataTable dbTableSuperficies = dtSetSuperficies.Tables[0];
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
@@ -907,10 +747,6 @@ namespace MigraWinPred
                         insertaSuperficies(mySqlConnection, dbRow, buena);
                     }
                 }
-                /*foreach (DataRow dbRow in dbTableSuperficies.Rows)
-                {
-                    insertaSuperficiesLog(mySqlConnection, dbRow);
-                }*/
 
                 foreach (DataRow dbRow in dbTableSuperficies.Rows)
                 {
@@ -964,63 +800,51 @@ namespace MigraWinPred
                         insertaSuperCata(mySqlConnection, dbRow, "U", 25, "ESTADO", buena);
                     }
                 }
-                /*foreach (DataRow dbRow in dbTableSuperficies.Rows)
-                {
-                    insertaSuperCataLog(mySqlConnection, dbRow, "U", 22, "TIPO");
-                }
-                foreach (DataRow dbRow in dbTableSuperficies.Rows)
-                {
-                    insertaSuperCataLog(mySqlConnection, dbRow, "U", 23, "USO");
-                }
-                foreach (DataRow dbRow in dbTableSuperficies.Rows)
-                {
-                    insertaSuperCataLog(mySqlConnection, dbRow, "U", 24, "CALIDAD");
-                }
-                foreach (DataRow dbRow in dbTableSuperficies.Rows)
-                {
-                    insertaSuperCataLog(mySqlConnection, dbRow, "U", 25, "ESTADO");
-                }*/
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
             }
-            /*
-                          try
-                          {
-                              string jobData2 = @"SELECT * FROM NM.DBF";
-
-                              OdbcCommand cmd = new OdbcCommand();
-                              cmd.CommandText = (jobData2);
-
-                              OdbcDataAdapter dbAdapter = new OdbcDataAdapter(jobData2, connDBF);
-
-                              DataSet dtSetNM = new DataSet();
-                              dbAdapter.Fill(dtSetNM);
-                              MessageBox.Show("Si entra NM");
-                              DataTable dbTableNM = dtSetNM.Tables[0];
-
-                              foreach (DataRow dbRow in dbTableNM.Rows)
-                              {
-                                  insertaDNM(mySqlConnection, dbRow);
-                              }
-                
-                          }
-                          catch (Exception e)
-                          {
-                              MessageBox.Show(e.ToString());
-                          }*/
             connDBF.Close();
             mySqlConnection.Close();
 
-            // Create a dataset
             DataSet ds = new DataSet("Contribuyentes");
-            // Add Customers table to the dataset
-            //ds.Tables.Add(custTable);
-            // Attach the data set to a DataGrid
-            //dataGrid1.DataSource = ds.DefaultViewManager;
             regularSW.Stop();
             MessageBox.Show(regularSW.Elapsed.ToString());
+        }
+
+        private void insertaTraslado(SqlConnection mySqlConnection, DataRow dbRow)
+        {
+            try
+            {
+                var cmdPredio = new SqlCommand();
+                cmdPredio.Parameters.Clear();
+                cmdPredio.Connection = mySqlConnection;
+                cmdPredio.CommandType = CommandType.Text;
+                cmdPredio.CommandText = @"INSERT INTO [Tomin].[TominPredial].[Predio]"
+                    + "([Id_Nota],[Id_TipoTraslado],[Id_Movimiento],[Fecha_Mov],[Id_Tramite],[Id_User],[Id_Date])"
+                    + " VALUES"
+                    + "(@cvePredio,@subPredio,@numExt,@referencia1,@estatusIP,@superficie,@cveAnt,@escritura,"
+                    + "@factDemerito,@notaDemerito,@valCatastral,@valorFiscal,0)";
+                cmdPredio.Parameters.AddWithValue("@cvePredio", dbRow["CPRED"].ToString().Trim());
+                cmdPredio.ExecuteNonQuery();
+            }
+            catch (SqlException sex)
+            {
+                if (sex.Number == 2627)
+                {
+                    System.IO.File.AppendAllText(pathString, "Predio repetido: " + dbRow["CPRED"].ToString().Trim() + Environment.NewLine);
+                }
+                else
+                {
+                    MessageBox.Show(sex.Number.ToString());
+                }
+            }
+            catch (Exception e)
+            {
+                System.IO.File.AppendAllText(pathString, e.ToString() + Environment.NewLine);
+                System.IO.File.AppendAllText(pathString, dbRow["CPRED"].ToString().Trim() + Environment.NewLine);
+            }
         }
 
         private void insertaPredioCatalogoUso(SqlConnection mySqlConnection, DataRow dbRow, string tipo, int tablaOp, string tabla)
@@ -1442,7 +1266,7 @@ namespace MigraWinPred
                     {
                         System.IO.File.AppendAllText(pathString, e.ToString() + Environment.NewLine);
                         System.IO.File.AppendAllText(pathString, dbRow.ToString() + Environment.NewLine);
-                       //MessageBox.Show(e.ToString());
+                        //MessageBox.Show(e.ToString());
                     }
                 }
             }
@@ -1540,7 +1364,7 @@ namespace MigraWinPred
                     {
                         System.IO.File.AppendAllText(pathString, e.ToString() + Environment.NewLine);
                         System.IO.File.AppendAllText(pathString, dbRow.ToString() + Environment.NewLine);
-                       // MessageBox.Show(e.ToString());
+                        // MessageBox.Show(e.ToString());
                     }
                 }
             }
@@ -1918,9 +1742,9 @@ namespace MigraWinPred
                 cmd1.CommandType = CommandType.Text;
                 cmd1.CommandText = @"create view vwPredial as select Clave, ClaveAnt from Tomin.TominPredial.Predio";
                 cmd1.ExecuteNonQuery();
-                
+
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
             }
@@ -1935,7 +1759,7 @@ namespace MigraWinPred
                 cmd1.Parameters.Clear();
                 cmd1.Connection = mySqlConnection;
                 cmd1.CommandType = CommandType.Text;
-                cmd1.CommandText = @"select MAX(Clave) from vwPredial where "+ donde + " = @clave";
+                cmd1.CommandText = @"select MAX(Clave) from vwPredial where " + donde + " = @clave";
                 cmd1.Parameters.AddWithValue("@clave", dbRow["CPRED"].ToString().Trim());
                 var so = cmd1.ExecuteScalar();
                 if (!so.Equals(DBNull.Value))
@@ -2656,13 +2480,6 @@ namespace MigraWinPred
                 }
                 else
                 {
-                    MessageBox.Show(dbRow["REF_ENTRE1"].ToString().Trim());
-                    MessageBox.Show(dbRow["U_TERRENO"].ToString().Trim());
-                    MessageBox.Show(dbRow["DEM_FACTOR"].ToString().Trim());
-                    MessageBox.Show(dbRow["DEM_NOTAS"].ToString().Trim());
-                    MessageBox.Show(dbRow["VAL_CAT"].ToString().Trim());
-                    MessageBox.Show(dbRow["VAL_FIS"].ToString().Trim());
-                    MessageBox.Show(dbRow["CPRED"].ToString().Trim() + sex.ToString());
                     MessageBox.Show(sex.Number.ToString());
                 }
                 return false;
@@ -2671,8 +2488,6 @@ namespace MigraWinPred
             {
                 System.IO.File.AppendAllText(pathString, e.ToString() + Environment.NewLine);
                 System.IO.File.AppendAllText(pathString, dbRow["CPRED"].ToString().Trim() + Environment.NewLine);
-
-                MessageBox.Show("predio  " + e.ToString());
                 return false;
             }
         }
